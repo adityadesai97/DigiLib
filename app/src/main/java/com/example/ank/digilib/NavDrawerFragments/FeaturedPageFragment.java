@@ -6,12 +6,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.ank.digilib.Adapters.FeaturedBooksAdapter;
-import com.example.ank.digilib.Objects.Book;
+import com.example.ank.digilib.Adapters.GenresAdapter;
+import com.example.ank.digilib.Objects.Genre;
 import com.example.ank.digilib.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,7 +18,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -30,13 +28,13 @@ public class FeaturedPageFragment extends android.support.v4.app.Fragment {
 
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
-    private FeaturedBooksAdapter adapter;
+    private GenresAdapter adapter;
 
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private ValueEventListener valueEventListener;
 
-    private ArrayList<Book> bookList;
+    private ArrayList<Genre> genreList;
 
     @Nullable
     @Override
@@ -47,33 +45,46 @@ public class FeaturedPageFragment extends android.support.v4.app.Fragment {
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference().child("books");
 
-        bookList = new ArrayList<>();
+        genreList = new ArrayList<>();
 
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.featured_book_list);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.genre_list);
         gridLayoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        FeaturedPageFragment.FetchBookList fBL = new FeaturedPageFragment.FetchBookList();
-        fBL.execute();
+
+//        databaseReference.push().setValue(new Genre("Fantasy"));
+//        databaseReference.push().setValue(new Genre("Mystery"));
+//        databaseReference.push().setValue(new Genre("Non Fiction"));
+//        databaseReference.push().setValue(new Genre("Educational"));
+
+        FeaturedPageFragment.FetchGenreList fGL = new FeaturedPageFragment.FetchGenreList();
+        fGL.execute();
+
+//        databaseReference.push().setValue(new Book("Harry Potter and the Philospher's Stone", "J.K. Rowling", "300", "75"));
+//        databaseReference.push().setValue(new Book("Harry Potter and the Chamber of Secrets", "J.K. Rowling", "300", "75"));
+//        databaseReference.push().setValue(new Book("Harry Potter and the Prisoner of Azkaban", "J.K. Rowling", "300", "75"));
+//        databaseReference.push().setValue(new Book("Harry Potter and the Goblet of Fire", "J.K. Rowling", "300", "75"));
+//        databaseReference.push().setValue(new Book("Harry Potter and the Order of the Phoenix", "J.K. Rowling", "300", "75"));
+//        databaseReference.push().setValue(new Book("Harry Potter and the Half Blood Prince", "J.K. Rowling", "300", "75"));
+//        databaseReference.push().setValue(new Book("Harry Potter and the Deathly Hallows", "J.K. Rowling", "300", "75"));
+
 
         return rootView;
     }
 
-    public class FetchBookList extends AsyncTask<Void,Void,ArrayList<Book>> {
+    public class FetchGenreList extends AsyncTask<Void,Void,ArrayList<Genre>> {
 
         @Override
-        protected ArrayList<Book> doInBackground(Void... params) {
+        protected ArrayList<Genre> doInBackground(Void... params) {
 
             valueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    bookList.clear();
+                    genreList.clear();
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                         String name = (String) snapshot.child("name").getValue();
-                        String author = (String) snapshot.child("author").getValue();
-                        String category = (String) snapshot.child("category").getValue();
                         if(name != null) {
-                            bookList.add(new Book(name, author, category));
+                            genreList.add(new Genre(name));
                         }
                     }
                     updateUI();
@@ -91,7 +102,7 @@ public class FeaturedPageFragment extends android.support.v4.app.Fragment {
     }
 
     public void updateUI() {
-        adapter = new FeaturedBooksAdapter(bookList,getActivity());
+        adapter = new GenresAdapter(genreList);
         recyclerView.setAdapter(adapter);
     }
 }
