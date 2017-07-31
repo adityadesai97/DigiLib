@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.2.0/f7873a2ebde246a45c2a8d6f3247108b4c88a879/okhttp-3.2.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f7873a2ebde246a45c2a8d6f3247108b4c88a879">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/okhttp-3.2.0_ff8ecb7a575db822bbc43de9d83fd00b0de48028.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/e11dc454b925c6537d41e0d2aa6a49069cbd3eb6/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="73591df4ec047e55db9415034d1dfab617fa9f3c">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_0a643782fb9a2d810d72caa0765de3388be476bf.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/460e96be1b7ae5a7373d9a6479f8a65493de713e/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="343ad59d9fb3bbf6ab99baafad859eb4b0fecc02">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_04550df5fc3cbd399664ef541adc40ae10a34863.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.6.1/b9d63507329a7178e026fc334f87587ee5070ac5/gson-2.6.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="b9d63507329a7178e026fc334f87587ee5070ac5">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/gson-2.6.1_54f8b748de8685756626dcbc3aba16c293e69d7a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/17f19d120fca25da1a6deb04673fa1949ed3d880/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="7308fa2037dac339ea04b90cdd17e87f835ea294">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_6f88f8c2e8794952e23da8b0e840398fda73a8f4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/99fd1d8356548552a84173230bd0ff774ef45d80/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="895c63ba9782b04f0c5da69205216f6ec87119eb">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_ca52d3946db30663beb358143a14780c3267b6f5.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/0ef482c8128090f4f9c1f8c3dfbc92265c09e44c/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="a10ed1f1cff990ef081263ad33f13dc6c207eb4e">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_2cfe1edefc7af95d1298d6a6285d8caae9b16823.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/converter-gson/2.0.2/f8d87f15b94b8d74e7ccf61d7eedb558811cdb30/converter-gson-2.0.2.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f8d87f15b94b8d74e7ccf61d7eedb558811cdb30">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/converter-gson-2.0.2_086b510b96a6a73bd70411785676fc8f39ae6a8b.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/retrofit/2.0.2/43eeae0b9fb087bb3194ba59ab63a38a32fbf3e/retrofit-2.0.2.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="043eeae0b9fb087bb3194ba59ab63a38a32fbf3e">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/retrofit-2.0.2_c12a4cda860718ffdede70ee283a6ea9de10b298.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/fb684829f319c5ebdc12d10d22d93c9325519e37/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e96c6974cf924e7ee3b230e6847d5731423388c9">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_1a7e768917162b92a3f8e8dbe67b8001a39705c0.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/ca191d312d951d9f236f5b86377d3c4b492a632d/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="a319fd4d548ba4cc9511561d37109ba922bfbf6a">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_f99f3b64d889d21ec8469e1015c00c8c3a843ac0.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/eaafe1382defeab3dab662b829f27799153f0bff/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="43a08f2cc1bc8e9678b5a1740f3b91b50ab50ac6">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_7fa1819eb94a8dae6baf53d741d514b9abe7545d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/205790a2618adc993df965c8bc712c8c60eb374a/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="9aea94e7aa8a8ed235566a120aa52d8ace3d9fe4">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_7a4782fd11bee61aac5ae1f26c82f7f1f068d1b7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.6.0/98476622f10715998eacf9240d6b479f12c66143/okio-1.6.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="98476622f10715998eacf9240d6b479f12c66143">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/okio-1.6.0_1efda36188f13e3c8529d320e380c5196fbbc1a4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.android/build-cache/c9690f9beb556e425c3037367e5a98d198e29e43/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="e2185aff89caeb337b1ffc36d5e525d8318e7cfe">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/classes_b0a10437e0bd6f24321129a956229492de4db51a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/adityadesai/.gradle/caches/modules-2/files-2.1/com.twitter/twitter-text/1.13.0/78415b95ae3184c5926d593feab64bfc0b73b2dd/twitter-text-1.13.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="78415b95ae3184c5926d593feab64bfc0b73b2dd">
+        <dex dex="/Users/adityadesai/Desktop/Android/DigiLib/app/build/intermediates/pre-dexed/debug/twitter-text-1.13.0_f6f27a67570b5909460546baac57a64f7934ce46.jar" />
+    </item>
+
+</items>
