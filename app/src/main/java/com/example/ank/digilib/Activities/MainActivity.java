@@ -33,8 +33,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -97,22 +101,62 @@ public class MainActivity extends AppCompatActivity
                 user = firebaseAuth.getCurrentUser();
                 if(user != null) {
 
-                    if(!prefs.getBoolean("firstTime", false)){
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                if(snapshot.child("uid").getValue().toString().equals(user.getUid())) {
+                                    SharedPreferences.Editor editor = prefs.edit();
+                                    editor.putBoolean("firstTime", false);
+                                    editor.commit();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    if(prefs.getBoolean("firstTime", true)){
                         editor = getSharedPreferences("userInfo",MODE_APPEND).edit();
                         editor.putString("name",user.getDisplayName());
                         editor.putString("email",user.getEmail());
                         editor.putString("pic",user.getPhotoUrl().toString());
                         editor.putString("uid",user.getUid());
                         editor.commit();
-                        databaseReference.push().setValue(new User(user.getDisplayName(), user.getUid(), user.getEmail(), user.getPhotoUrl().toString()));
+
+                        databaseReference.push().setValue(new User(user.getDisplayName(), user.getUid(), user.getEmail(), user.getPhotoUrl().toString(), "1000"));
+
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("firstTime", false);
+                        editor.commit();
                     }
                     else {
                         Toast.makeText(MainActivity.this, "Welcome!", Toast.LENGTH_SHORT).show();
-                        ImageView profilePicture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.profile_picture);
-                        Glide.with(profilePicture.getContext()).load(user.getPhotoUrl()).into(profilePicture);
+                        databaseReference.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                    if(snapshot.child("uid").getValue().toString().equals(user.getUid())) {
+                                        ImageView profilePicture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.profile_picture);
+                                        Glide.with(profilePicture.getContext()).load(snapshot.child("profile_url").getValue().toString()).into(profilePicture);
 
-                        TextView username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.username);
-                        username.setText(user.getDisplayName());
+                                        TextView username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.username);
+                                        username.setText(snapshot.child("name").getValue().toString());
+
+                                        TextView balance = (TextView) navigationView.getHeaderView(0).findViewById(R.id.credit_balance);
+                                        balance.setText("Balance: "+ snapshot.child("credits").getValue().toString());
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 }
                 else {
