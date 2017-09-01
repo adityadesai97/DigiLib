@@ -8,11 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.ank.digilib.Activities.BookListActivity;
 import com.example.ank.digilib.Objects.Book;
 import com.example.ank.digilib.Objects.Genre;
 import com.example.ank.digilib.R;
 
 import java.util.ArrayList;
+
+import static android.R.attr.id;
 
 /**
  * Created by adityadesai on 01/08/17.
@@ -27,6 +30,9 @@ public class GenresAdapter extends RecyclerView.Adapter<GenresAdapter.MenuHolder
         private TextView nameTextView;
         private TextView authorTextView;
 
+        private Genre mGenre;
+        private String name;
+
         public MenuHolder(View v) {
             super(v);
 
@@ -36,6 +42,16 @@ public class GenresAdapter extends RecyclerView.Adapter<GenresAdapter.MenuHolder
 
         @Override
         public void onClick(View v) {
+            int position = getAdapterPosition();
+            mGenre = mGenres.get(position);
+
+            if(mGenre!=null){
+                name = mGenre.getName();
+            }
+
+            Intent i=new Intent(v.getContext(),BookListActivity.class);
+            i.putExtra("genreName", name);
+            v.getContext().startActivity(i);
         }
 
         public void bindIndustry(String name) {

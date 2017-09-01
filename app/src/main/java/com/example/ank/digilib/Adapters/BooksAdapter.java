@@ -1,13 +1,22 @@
 package com.example.ank.digilib.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.example.ank.digilib.Activities.BookActivity;
+import com.example.ank.digilib.Activities.BookListActivity;
 import com.example.ank.digilib.Objects.Book;
+import com.example.ank.digilib.Objects.Genre;
 import com.example.ank.digilib.R;
 
 import java.util.ArrayList;
@@ -24,27 +33,45 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MenuHolder>{
 
         private TextView nameTextView;
         private TextView authorTextView;
+        private ImageView coverImageView;
+
+        private Book mBook;
+        private String bookName;
+        private String genreName;
 
         public MenuHolder(View v) {
             super(v);
 
             nameTextView = (TextView) v.findViewById(R.id.book_name);
             authorTextView = (TextView) v.findViewById(R.id.book_author);
+            coverImageView = (ImageView) v.findViewById(R.id.book_cover);
             v.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
+            int position = getAdapterPosition();
+            mBook = mBooks.get(position);
 
+            if(mBook!=null){
+                bookName = mBook.getName();
+                genreName = mBook.getGenreName();
+            }
+
+            Intent i=new Intent(v.getContext(), BookActivity.class);
+            i.putExtra("bookName", bookName);
+            i.putExtra("genreName", genreName);
+            v.getContext().startActivity(i);
         }
 
-        public void bindIndustry(String bookName, String bookAuthor) {
+        public void bindIndustry(String bookName, String bookAuthor, String bookCoverURL) {
             nameTextView.setText(bookName);
             authorTextView.setText("- "+bookAuthor);
+            Glide.with(coverImageView.getContext()).load(bookCoverURL).into(coverImageView);
         }
     }
 
-    public BooksAdapter(ArrayList<Book> books, Context context) {
+    public BooksAdapter(ArrayList<Book> books) {
         mBooks = books;
     }
 
@@ -59,7 +86,8 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MenuHolder>{
     public void onBindViewHolder(BooksAdapter.MenuHolder holder, int position) {
         String bookName = mBooks.get(position).getName();
         String bookAuthor = mBooks.get(position).getAuthor();
-        holder.bindIndustry(bookName, bookAuthor);
+        String bookCoverURL = mBooks.get(position).getCoverImageURL();
+        holder.bindIndustry(bookName, bookAuthor, bookCoverURL);
     }
 
     @Override

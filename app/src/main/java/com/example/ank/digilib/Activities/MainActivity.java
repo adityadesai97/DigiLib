@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringDef;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.ank.digilib.NavDrawerFragments.FeaturedPageFragment;
+import com.example.ank.digilib.NavDrawerFragments.MyBooksFragment;
 import com.example.ank.digilib.Objects.Book;
 import com.example.ank.digilib.Objects.User;
 import com.example.ank.digilib.R;
@@ -39,6 +41,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -126,7 +133,6 @@ public class MainActivity extends AppCompatActivity
                         editor.putString("pic",user.getPhotoUrl().toString());
                         editor.putString("uid",user.getUid());
                         editor.commit();
-
                         databaseReference.push().setValue(new User(user.getDisplayName(), user.getUid(), user.getEmail(), user.getPhotoUrl().toString(), "1000"));
 
                         SharedPreferences.Editor editor = prefs.edit();
@@ -256,7 +262,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.featured) {
             fragment = new FeaturedPageFragment();
         } else if (id == R.id.my_books) {
-            fragment = new FeaturedPageFragment();
+            fragment = new MyBooksFragment();
         } else if (id == R.id.sign_out) {
             AuthUI.getInstance()
                     .signOut(this)
