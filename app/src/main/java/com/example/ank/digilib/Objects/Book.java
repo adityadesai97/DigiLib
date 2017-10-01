@@ -21,6 +21,10 @@ public class Book {
         this.genreName = genreName;
     }
 
+    public Book() {
+        this.name = "dummy";
+    }
+
     public String getName() {
         return name;
     }

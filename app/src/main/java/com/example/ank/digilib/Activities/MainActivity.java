@@ -2,31 +2,36 @@ package com.example.ank.digilib.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.ank.digilib.NavDrawerFragments.FeaturedPageFragment;
-import com.example.ank.digilib.NavDrawerFragments.MyBooksFragment;
+
+import com.example.ank.digilib.Adapters.FeedAdapter;
+import com.example.ank.digilib.Adapters.GenresAdapter;
 import com.example.ank.digilib.Objects.Book;
+import com.example.ank.digilib.Objects.ChosenBook;
+import com.example.ank.digilib.Objects.FeedEvent;
+import com.example.ank.digilib.Objects.Genre;
+import com.example.ank.digilib.Objects.Request;
 import com.example.ank.digilib.Objects.User;
 import com.example.ank.digilib.R;
 import com.firebase.ui.auth.AuthUI;
@@ -40,15 +45,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import static io.fabric.sdk.android.services.concurrency.AsyncTask.init;
+
+public class MainActivity extends AppCompatActivity {
 
     public static final String ANONYMOUS = "anonymous";
     public static final int RC_SIGN_IN=1;
@@ -60,63 +61,137 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseUser user;
     private FirebaseDatabase firebaseDatabase;
-    private DatabaseReference databaseReference;
+    private DatabaseReference userDatabaseReference;
+    private DatabaseReference genreDatabaseReference;
+    private DatabaseReference chosenBooksDatabaseReference;
+    private ValueEventListener valueEventListener;
 
-    private String mUsername;
+    private RecyclerView genreRecyclerView;
+    private RecyclerView feedRecyclerView;
+    private GridLayoutManager gridLayoutManager;
+    private LinearLayoutManager linearLayoutManager;
+    private GenresAdapter genresAdapter;
+    private FeedAdapter feedAdapter;
+
+    private ArrayList<Genre> genreList;
+    private ArrayList<FeedEvent> feedList;
+    private String startCredits = "10000";
+    private int userFoundFlag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mUsername = ANONYMOUS;
+
+        ViewGroup actionBarLayout = (ViewGroup) getLayoutInflater().inflate(R.layout.custom_actionbar, null);
+
+        actionBarLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(actionBarLayout);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference().child("users");
+        userDatabaseReference = firebaseDatabase.getReference().child("users");
+        genreDatabaseReference = firebaseDatabase.getReference().child("books");
+        chosenBooksDatabaseReference = firebaseDatabase.getReference().child("chosenBooks");
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        genreList = new ArrayList<>();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        genreRecyclerView = (RecyclerView)findViewById(R.id.genre_list);
+        gridLayoutManager = new GridLayoutManager(this, 2);
+        genreRecyclerView.setLayoutManager(gridLayoutManager);
+
+        final com.github.clans.fab.FloatingActionMenu menuFab = (com.github.clans.fab.FloatingActionMenu) findViewById(R.id.menu_fab);
+        menuFab.setIconAnimated(false);
+        menuFab.setClosedOnTouchOutside(true);
+
+        com.github.clans.fab.FloatingActionButton myBooksFab = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.my_books_fab);
+        myBooksFab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View v) {
+                menuFab.close(false);
+                Intent i = new Intent(v.getContext(), MyBooksActivity.class);
+                v.getContext().startActivity(i);
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        com.github.clans.fab.FloatingActionButton teamFab = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.team_fab);
+        teamFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menuFab.close(true);
+//                Intent i = new Intent(v.getContext(), TeamActivity.class);
+//                v.getContext().startActivity(i);
+                Toast.makeText(v.getContext(), "This feature is currently unavailable", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        com.github.clans.fab.FloatingActionButton myFriendsFab = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.friends_fab);
+        myFriendsFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menuFab.close(false);
+                Intent i = new Intent(v.getContext(), MyFriendsActivity.class);
+                v.getContext().startActivity(i);
+            }
+        });
 
-        FragmentTransaction transaction=getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.mainFrame,new FeaturedPageFragment());
-        transaction.commit();
+        LinearLayout getMoreCredits = (LinearLayout) findViewById(R.id.get_more_button);
+        getMoreCredits.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "This feature is currently unavailable", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        MainActivity.FetchGenreList fGL = new MainActivity.FetchGenreList();
+        fGL.execute();
 
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 user = firebaseAuth.getCurrentUser();
                 if(user != null) {
-
-                    databaseReference.addValueEventListener(new ValueEventListener() {
+                    Log.v("tag1", "yessss");
+                    userDatabaseReference.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 if(snapshot.child("uid").getValue().toString().equals(user.getUid())) {
-                                    SharedPreferences.Editor editor = prefs.edit();
-                                    editor.putBoolean("firstTime", false);
-                                    editor.commit();
+                                    ImageView profilePicture = (ImageView) findViewById(R.id.profile_picture);
+                                    Glide.with(profilePicture.getContext()).load(snapshot.child("profile_url").getValue().toString()).into(profilePicture);
+
+                                    TextView username = (TextView) findViewById(R.id.username);
+                                    username.setText("Welcome! " + snapshot.child("name").getValue().toString().split("\\s+")[0]);
+
+                                    TextView balance = (TextView) findViewById(R.id.credit_balance);
+                                    balance.setText(snapshot.child("credits").getValue().toString() + " DigiCreds");
+                                    userFoundFlag = 1;
+//                                    SharedPreferences.Editor editor = prefs.edit();
+//                                    editor.putBoolean("firstTime", false);
+//                                    editor.commit();
                                 }
+                            }
+                            if(userFoundFlag == 0) {
+                                userDatabaseReference.push().setValue(new User(user.getDisplayName(), user.getUid(), user.getEmail(), user.getPhotoUrl().toString(), startCredits));
+                                chosenBooksDatabaseReference.child(user.getUid()).push().setValue(new ChosenBook());
+
+                                ImageView profilePicture = (ImageView) findViewById(R.id.profile_picture);
+                                Glide.with(profilePicture.getContext()).load(user.getPhotoUrl().toString()).into(profilePicture);
+
+                                TextView username = (TextView) findViewById(R.id.username);
+                                username.setText("Welcome! " + user.getDisplayName().toString().split("\\s+")[0]);
+
+                                TextView balance = (TextView) findViewById(R.id.credit_balance);
+                                balance.setText(startCredits + " DigiCreds");
                             }
                         }
 
@@ -125,48 +200,56 @@ public class MainActivity extends AppCompatActivity
 
                         }
                     });
-
-                    if(prefs.getBoolean("firstTime", true)){
-                        editor = getSharedPreferences("userInfo",MODE_APPEND).edit();
-                        editor.putString("name",user.getDisplayName());
-                        editor.putString("email",user.getEmail());
-                        editor.putString("pic",user.getPhotoUrl().toString());
-                        editor.putString("uid",user.getUid());
-                        editor.commit();
-                        databaseReference.push().setValue(new User(user.getDisplayName(), user.getUid(), user.getEmail(), user.getPhotoUrl().toString(), "1000"));
-
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putBoolean("firstTime", false);
-                        editor.commit();
-                    }
-                    else {
-                        Toast.makeText(MainActivity.this, "Welcome!", Toast.LENGTH_SHORT).show();
-                        databaseReference.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                    if(snapshot.child("uid").getValue().toString().equals(user.getUid())) {
-                                        ImageView profilePicture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.profile_picture);
-                                        Glide.with(profilePicture.getContext()).load(snapshot.child("profile_url").getValue().toString()).into(profilePicture);
-
-                                        TextView username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.username);
-                                        username.setText(snapshot.child("name").getValue().toString());
-
-                                        TextView balance = (TextView) navigationView.getHeaderView(0).findViewById(R.id.credit_balance);
-                                        balance.setText("Balance: "+ snapshot.child("credits").getValue().toString());
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
+//                    if(prefs.getBoolean("firstTime", true)){
+//                        editor = getSharedPreferences("userInfo",MODE_APPEND).edit();
+//                        editor.putString("name",user.getDisplayName());
+//                        editor.putString("email",user.getEmail());
+//                        editor.putString("pic",user.getPhotoUrl().toString());
+//                        editor.putString("uid",user.getUid());
+//                        editor.commit();
+//                        userDatabaseReference.push().setValue(new User(user.getDisplayName(), user.getUid(), user.getEmail(), user.getPhotoUrl().toString(), startCredits));
+//                        chosenBooksDatabaseReference.child(user.getUid()).push().setValue(new ChosenBook());
+//
+//                        ImageView profilePicture = (ImageView) findViewById(R.id.profile_picture);
+//                        Glide.with(profilePicture.getContext()).load(user.getPhotoUrl().toString()).into(profilePicture);
+//
+//                        TextView username = (TextView) findViewById(R.id.username);
+//                        username.setText("Welcome! " + user.getDisplayName().toString().split("\\s+")[0]);
+//
+//                        TextView balance = (TextView) findViewById(R.id.credit_balance);
+//                        balance.setText(startCredits + " DigiCreds");
+//;
+//                        SharedPreferences.Editor editor = prefs.edit();
+//                        editor.putBoolean("firstTime", false);
+//                        editor.commit();
+//                        Log.v("tag1", "first time");
+//                    }
+//                    else {
+//                        userDatabaseReference.addValueEventListener(new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(DataSnapshot dataSnapshot) {
+//                                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                    if(snapshot.child("uid").getValue().toString().equals(user.getUid())) {
+//                                        ImageView profilePicture = (ImageView) findViewById(R.id.profile_picture);
+//                                        Glide.with(profilePicture.getContext()).load(snapshot.child("profile_url").getValue().toString()).into(profilePicture);
+//
+//                                        TextView username = (TextView) findViewById(R.id.username);
+//                                        username.setText("Welcome! " + snapshot.child("name").getValue().toString().split("\\s+")[0]);
+//
+//                                        TextView balance = (TextView) findViewById(R.id.credit_balance);
+//                                        balance.setText(snapshot.child("credits").getValue().toString() + " DigiCreds");
+//                                    }
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(DatabaseError databaseError) {
+//
+//                            }
+//                        });
+//                    }
                 }
                 else {
-                    onSignedOutCleanup();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
@@ -179,8 +262,39 @@ public class MainActivity extends AppCompatActivity
         };
     }
 
-    private void onSignedOutCleanup(){
-        mUsername=ANONYMOUS;
+    public class FetchGenreList extends AsyncTask<Void,Void,ArrayList<Genre>> {
+
+        @Override
+        protected ArrayList<Genre> doInBackground(Void... params) {
+
+            valueEventListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    genreList.clear();
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        String name = (String) snapshot.child("name").getValue();
+                        String backgroundImage = (String) snapshot.child("backgroundImage").getValue();
+                        if(name != null) {
+                            genreList.add(new Genre(name, backgroundImage));
+                        }
+                    }
+                    updateUI();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+            genreDatabaseReference.addValueEventListener(valueEventListener);
+            return null;
+        }
+    }
+
+    public void updateUI() {
+        genresAdapter = new GenresAdapter(genreList);
+        genreRecyclerView.setAdapter(genresAdapter);
     }
 
     @Override
@@ -197,23 +311,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void onSignedInInitialize(String username) {
-        mUsername = username;
-        //user.sendEmailVerification();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                // Sign-in succeeded, set up the UI
                 Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.mainFrame, new FeaturedPageFragment());
-                transaction.commit();
             } else if (resultCode == RESULT_CANCELED) {
-                // Sign in was canceled by the user, finish the activity
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -221,72 +325,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        Fragment fragment = null;
-
-        if (id == R.id.featured) {
-            fragment = new FeaturedPageFragment();
-        } else if (id == R.id.my_books) {
-            fragment = new MyBooksFragment();
-        } else if (id == R.id.sign_out) {
+        if (id == R.id.sign_out) {
             AuthUI.getInstance()
                     .signOut(this)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         public void onComplete(@NonNull Task<Void> task) {
                         }
                     });
-        } else if (id == R.id.feedback) {
-            fragment = new FeaturedPageFragment();
-        } else if (id == R.id.our_team) {
-            fragment = new FeaturedPageFragment();
+            return true;
         }
 
-        if(id != R.id.sign_out){
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.mainFrame, fragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        return super.onOptionsItemSelected(item);
     }
+
 }

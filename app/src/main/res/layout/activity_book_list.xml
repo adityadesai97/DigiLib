@@ -17,6 +17,12 @@
         android:id="@+id/is_empty_marker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        tools:text="Sorry, there are no books currently avaialble in this genre."
+        android:textSize="30dp"
+        android:padding="16dp"
+        android:gravity="center_horizontal"
+        android:fontFamily="cursive"
+        android:textColor="@color/textColor"/>
 
 </RelativeLayout>

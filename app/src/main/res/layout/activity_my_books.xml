@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.ank.digilib.Activities.MyBooksActivity">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/book_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </android.support.v7.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/is_empty_marker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        tools:text="You havent bought or rented any books yet!"
+        android:textSize="30dp"
+        android:padding="16dp"
+        android:gravity="center_horizontal"
+        android:fontFamily="cursive"
+        android:textColor="@color/textColor"/>
+
+</RelativeLayout>

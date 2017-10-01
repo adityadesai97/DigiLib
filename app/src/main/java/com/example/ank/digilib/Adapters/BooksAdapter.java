@@ -1,11 +1,7 @@
 package com.example.ank.digilib.Adapters;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.ank.digilib.Activities.BookActivity;
-import com.example.ank.digilib.Activities.BookListActivity;
 import com.example.ank.digilib.Objects.Book;
-import com.example.ank.digilib.Objects.Genre;
 import com.example.ank.digilib.R;
 
 import java.util.ArrayList;
@@ -68,6 +62,7 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MenuHolder>{
             nameTextView.setText(bookName);
             authorTextView.setText("- "+bookAuthor);
             Glide.with(coverImageView.getContext()).load(bookCoverURL).into(coverImageView);
+            coverImageView.setImageAlpha(175);
         }
     }
 

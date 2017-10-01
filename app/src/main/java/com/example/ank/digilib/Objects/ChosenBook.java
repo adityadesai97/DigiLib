@@ -9,10 +9,16 @@ public class ChosenBook {
     private String genreName;
     private String purchaseType;
 
-    public ChosenBook(String key, String genre, String purchaseType) {
+    public ChosenBook(String key, String genreName, String purchaseType) {
         this.key = key;
-        this.genreName = genre;
+        this.genreName = genreName;
         this.purchaseType = purchaseType;
+    }
+
+    public ChosenBook() {
+        this.key = "dummy";
+        this.genreName = "dummy";
+        this.purchaseType = "dummy";
     }
 
     public String getKey() {

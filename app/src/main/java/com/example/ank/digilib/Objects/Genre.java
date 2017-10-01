@@ -7,12 +7,18 @@ package com.example.ank.digilib.Objects;
 public class Genre {
 
     private String name;
+    private String backgroundImage;
 
-    public Genre(String name) {
+    public Genre(String name, String backgroundImage) {
         this.name = name;
+        this.backgroundImage = backgroundImage;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getBackgroundImage() {
+        return backgroundImage;
     }
 }

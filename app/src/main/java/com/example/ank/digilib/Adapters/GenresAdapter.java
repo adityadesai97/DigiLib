@@ -1,21 +1,19 @@
 package com.example.ank.digilib.Adapters;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.ank.digilib.Activities.BookListActivity;
-import com.example.ank.digilib.Objects.Book;
 import com.example.ank.digilib.Objects.Genre;
 import com.example.ank.digilib.R;
 
 import java.util.ArrayList;
-
-import static android.R.attr.id;
 
 /**
  * Created by adityadesai on 01/08/17.
@@ -28,7 +26,7 @@ public class GenresAdapter extends RecyclerView.Adapter<GenresAdapter.MenuHolder
     public static class MenuHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView nameTextView;
-        private TextView authorTextView;
+        private ImageView genreImage;
 
         private Genre mGenre;
         private String name;
@@ -37,6 +35,7 @@ public class GenresAdapter extends RecyclerView.Adapter<GenresAdapter.MenuHolder
             super(v);
 
             nameTextView = (TextView) v.findViewById(R.id.genre_name);
+            genreImage = (ImageView) v.findViewById(R.id.genre_image);
             v.setOnClickListener(this);
         }
 
@@ -54,8 +53,9 @@ public class GenresAdapter extends RecyclerView.Adapter<GenresAdapter.MenuHolder
             v.getContext().startActivity(i);
         }
 
-        public void bindIndustry(String name) {
+        public void bindIndustry(String name, String backgroundImage) {
             nameTextView.setText(name);
+            Glide.with(genreImage.getContext()).load(backgroundImage).into(genreImage);
         }
     }
 
@@ -73,7 +73,8 @@ public class GenresAdapter extends RecyclerView.Adapter<GenresAdapter.MenuHolder
     @Override
     public void onBindViewHolder(GenresAdapter.MenuHolder holder, int position) {
         String name = mGenres.get(position).getName();
-        holder.bindIndustry(name);
+        String backgroundImage = mGenres.get(position).getBackgroundImage();
+        holder.bindIndustry(name, backgroundImage);
     }
 
     @Override
