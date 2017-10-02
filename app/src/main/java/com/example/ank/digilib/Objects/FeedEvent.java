@@ -6,20 +6,32 @@ package com.example.ank.digilib.Objects;
 
 public class FeedEvent {
 
-    private String userId;
+    private String genreName;
+    private String name;
+    private String profile_id;
     private String bookId;
     private String purchaseType;
     private String timestamp;
 
-    public FeedEvent(String userId, String bookId, String purchaseType, String timestamp) {
-        this.userId = userId;
+    public FeedEvent(String genreName, String name, String profile_id, String bookId, String purchaseType, String timestamp) {
+        this.genreName = genreName;
+        this.name = name;
+        this.profile_id = profile_id;
         this.bookId = bookId;
         this.purchaseType = purchaseType;
         this.timestamp = timestamp;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getGenreName() {
+        return genreName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getProfile_id() {
+        return profile_id;
     }
 
     public String getBookId() {

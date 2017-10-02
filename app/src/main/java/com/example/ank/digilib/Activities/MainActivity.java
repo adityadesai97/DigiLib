@@ -45,7 +45,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import static io.fabric.sdk.android.services.concurrency.AsyncTask.init;
 
@@ -94,8 +98,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setCustomView(actionBarLayout);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
         userDatabaseReference = firebaseDatabase.getReference().child("users");
@@ -103,10 +105,14 @@ public class MainActivity extends AppCompatActivity {
         chosenBooksDatabaseReference = firebaseDatabase.getReference().child("chosenBooks");
 
         genreList = new ArrayList<>();
+        feedList = new ArrayList<>();
 
         genreRecyclerView = (RecyclerView)findViewById(R.id.genre_list);
         gridLayoutManager = new GridLayoutManager(this, 2);
         genreRecyclerView.setLayoutManager(gridLayoutManager);
+        feedRecyclerView = (RecyclerView)findViewById(R.id.feed_list);
+        linearLayoutManager = new LinearLayoutManager(this);
+        feedRecyclerView.setLayoutManager(linearLayoutManager);
 
         final com.github.clans.fab.FloatingActionMenu menuFab = (com.github.clans.fab.FloatingActionMenu) findViewById(R.id.menu_fab);
         menuFab.setIconAnimated(false);
@@ -127,8 +133,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 menuFab.close(true);
-//                Intent i = new Intent(v.getContext(), TeamActivity.class);
-//                v.getContext().startActivity(i);
                 Toast.makeText(v.getContext(), "This feature is currently unavailable", Toast.LENGTH_SHORT).show();
             }
         });
@@ -151,16 +155,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        MainActivity.FetchGenreList fGL = new MainActivity.FetchGenreList();
-        fGL.execute();
-
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 user = firebaseAuth.getCurrentUser();
                 if(user != null) {
-                    Log.v("tag1", "yessss");
                     userDatabaseReference.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -175,9 +174,6 @@ public class MainActivity extends AppCompatActivity {
                                     TextView balance = (TextView) findViewById(R.id.credit_balance);
                                     balance.setText(snapshot.child("credits").getValue().toString() + " DigiCreds");
                                     userFoundFlag = 1;
-//                                    SharedPreferences.Editor editor = prefs.edit();
-//                                    editor.putBoolean("firstTime", false);
-//                                    editor.commit();
                                 }
                             }
                             if(userFoundFlag == 0) {
@@ -200,54 +196,11 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                     });
-//                    if(prefs.getBoolean("firstTime", true)){
-//                        editor = getSharedPreferences("userInfo",MODE_APPEND).edit();
-//                        editor.putString("name",user.getDisplayName());
-//                        editor.putString("email",user.getEmail());
-//                        editor.putString("pic",user.getPhotoUrl().toString());
-//                        editor.putString("uid",user.getUid());
-//                        editor.commit();
-//                        userDatabaseReference.push().setValue(new User(user.getDisplayName(), user.getUid(), user.getEmail(), user.getPhotoUrl().toString(), startCredits));
-//                        chosenBooksDatabaseReference.child(user.getUid()).push().setValue(new ChosenBook());
-//
-//                        ImageView profilePicture = (ImageView) findViewById(R.id.profile_picture);
-//                        Glide.with(profilePicture.getContext()).load(user.getPhotoUrl().toString()).into(profilePicture);
-//
-//                        TextView username = (TextView) findViewById(R.id.username);
-//                        username.setText("Welcome! " + user.getDisplayName().toString().split("\\s+")[0]);
-//
-//                        TextView balance = (TextView) findViewById(R.id.credit_balance);
-//                        balance.setText(startCredits + " DigiCreds");
-//;
-//                        SharedPreferences.Editor editor = prefs.edit();
-//                        editor.putBoolean("firstTime", false);
-//                        editor.commit();
-//                        Log.v("tag1", "first time");
-//                    }
-//                    else {
-//                        userDatabaseReference.addValueEventListener(new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(DataSnapshot dataSnapshot) {
-//                                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                                    if(snapshot.child("uid").getValue().toString().equals(user.getUid())) {
-//                                        ImageView profilePicture = (ImageView) findViewById(R.id.profile_picture);
-//                                        Glide.with(profilePicture.getContext()).load(snapshot.child("profile_url").getValue().toString()).into(profilePicture);
-//
-//                                        TextView username = (TextView) findViewById(R.id.username);
-//                                        username.setText("Welcome! " + snapshot.child("name").getValue().toString().split("\\s+")[0]);
-//
-//                                        TextView balance = (TextView) findViewById(R.id.credit_balance);
-//                                        balance.setText(snapshot.child("credits").getValue().toString() + " DigiCreds");
-//                                    }
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(DatabaseError databaseError) {
-//
-//                            }
-//                        });
-//                    }
+                    MainActivity.FetchGenreList fGL = new MainActivity.FetchGenreList();
+                    fGL.execute();
+
+                    MainActivity.FetchFeedList fFL = new MainActivity.FetchFeedList();
+                    fFL.execute();
                 }
                 else {
                     startActivityForResult(
@@ -278,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                             genreList.add(new Genre(name, backgroundImage));
                         }
                     }
-                    updateUI();
+                    updateUI1();
                 }
 
                 @Override
@@ -292,9 +245,103 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateUI() {
+    public class FetchFeedList extends AsyncTask<Void,Void,ArrayList<FeedEvent>> {
+
+        @Override
+        protected ArrayList<FeedEvent> doInBackground(Void... params) {
+
+            valueEventListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    feedList.clear();
+                    for(final DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        if(snapshot.child("uid").getValue().equals(user.getUid()) && snapshot.hasChild("friends")) {
+                            userDatabaseReference.child(snapshot.getKey()).child("friends").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for(DataSnapshot snapshot1: dataSnapshot.getChildren()) {
+                                        final String friendUid = (String)snapshot1.child("uid").getValue();
+                                        userDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                for(final DataSnapshot snapshot2: dataSnapshot.getChildren()) {
+                                                    if(snapshot2.child("uid").getValue().toString().equals(friendUid)) {
+                                                        userDatabaseReference.child(snapshot2.getKey()).child("activity").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                for(DataSnapshot snapshot3: dataSnapshot.getChildren()) {
+                                                                    String genreName = (String)snapshot3.child("genreName").getValue();
+                                                                    String name = (String)snapshot3.child("name").getValue();
+                                                                    String profilepictureURL = (String)snapshot3.child("profile_id").getValue();
+                                                                    String bookId = (String)snapshot3.child("bookId").getValue();
+                                                                    String purchaseType = (String)snapshot3.child("purchaseType").getValue();
+                                                                    String timestamp = (String)snapshot3.child("timestamp").getValue();
+                                                                    Calendar c = Calendar.getInstance();
+                                                                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                                                    int timeDifference = 0;
+                                                                    try {
+                                                                        Date givenDate = df.parse(timestamp);
+                                                                        Date currentDate = c.getTime();
+                                                                        timeDifference = (int)(currentDate.getTime() - givenDate.getTime())/1000/60;
+                                                                    } catch (ParseException e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                    if(timeDifference <= 60) {
+                                                                        feedList.add(new FeedEvent(genreName, name, profilepictureURL, bookId, purchaseType, timestamp));
+                                                                    }
+                                                                    else {
+                                                                        userDatabaseReference.child(snapshot2.getKey()).child("activity").child(snapshot3.getKey()).removeValue();
+                                                                    }
+                                                                }
+                                                                updateUI2();
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+            userDatabaseReference.addValueEventListener(valueEventListener);
+            return null;
+        }
+    }
+
+    public void updateUI1() {
         genresAdapter = new GenresAdapter(genreList);
         genreRecyclerView.setAdapter(genresAdapter);
+    }
+
+    public void updateUI2() {
+        Log.v("tag1", Integer.toString(feedList.size()));
+        feedAdapter = new FeedAdapter(feedList);
+        feedRecyclerView.setAdapter(feedAdapter);
     }
 
     @Override

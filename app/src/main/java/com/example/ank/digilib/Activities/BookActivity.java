@@ -124,6 +124,8 @@ public class BookActivity extends AppCompatActivity {
                     if(snapshot.child("uid").getValue().toString().equals(user.getUid())) {
                         String key = snapshot.getKey();
                         String uid = (String) snapshot.child("uid").getValue();
+                        String name = (String)snapshot.child("name").getValue();
+                        String profilePictureURL = (String)snapshot.child("profile_url").getValue();
                         int credits = Integer.parseInt((String) snapshot.child("credits").getValue());
                         if(mode.equals("buy")) {
                             if(credits >= Integer.parseInt(bookBuyPrice)) {
@@ -131,7 +133,7 @@ public class BookActivity extends AppCompatActivity {
                                 int newCredits = credits - Integer.parseInt(bookBuyPrice);
                                 taskMap.put("credits", Integer.toString(newCredits));
                                 userDatabaseReference.child(key).updateChildren(taskMap);
-                                userDatabaseReference.child(key).child("activity").push().setValue(new FeedEvent(uid, bookKey, mode, formattedDate));
+                                userDatabaseReference.child(key).child("activity").push().setValue(new FeedEvent(genreName, name, profilePictureURL, bookKey, mode, formattedDate));
                                 chosenBookDatabaseReference.child(uid).push().setValue(new ChosenBook(bookKey, genreName, "buy"));
                                 Toast.makeText(BookActivity.this, "Thank you!", Toast.LENGTH_SHORT).show();
                                 buyButton.setEnabled(false);
@@ -147,6 +149,7 @@ public class BookActivity extends AppCompatActivity {
                                 int newCredits = credits - Integer.parseInt(bookRentPrice);
                                 taskMap.put("credits", Integer.toString(newCredits));
                                 userDatabaseReference.child(key).updateChildren(taskMap);
+                                userDatabaseReference.child(key).child("activity").push().setValue(new FeedEvent(genreName, name, profilePictureURL, bookKey, mode, formattedDate));
                                 chosenBookDatabaseReference.child(uid).push().setValue(new ChosenBook(bookKey, genreName, "rent"));
                                 Toast.makeText(BookActivity.this, "Thank you!", Toast.LENGTH_SHORT).show();
                                 buyButton.setEnabled(false);

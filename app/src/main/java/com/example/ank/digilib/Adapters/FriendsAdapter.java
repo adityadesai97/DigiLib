@@ -1,6 +1,7 @@
 package com.example.ank.digilib.Adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MenuHold
         }
 
         public void bindIndustry(final String name, final String profilePictureURL, final String uid, final String email) {
+            Log.v("tag1", name);
             nameTextView.setText(name);
             Glide.with(profilePicture.getContext()).load(profilePictureURL).into(profilePicture);
         }
