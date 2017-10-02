@@ -1,12 +1,23 @@
 package com.example.ank.digilib.Activities;
 
+import android.Manifest;
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ank.digilib.Objects.ChosenBook;
@@ -33,16 +44,20 @@ public class BookActivity extends AppCompatActivity {
     private DatabaseReference userDatabaseReference;
     private DatabaseReference bookDatabaseReference;
     private DatabaseReference chosenBookDatabaseReference;
-    private ValueEventListener valueEventListener;
 
     private Button buyButton;
     private Button rentButton;
+    private Button downloadButton;
 
     private String genreName;
     private String bookName;
     private String bookBuyPrice;
     private String bookRentPrice;
     private String bookKey;
+    private int bookFoundFlag = 0;
+    private String downloadLink;
+
+    private final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,18 +89,46 @@ public class BookActivity extends AppCompatActivity {
 
         buyButton = (Button)findViewById(R.id.buy_button);
         rentButton = (Button)findViewById(R.id.rent_button);
+        downloadButton = (Button)findViewById(R.id.download_button);
 
         bookDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                for(final DataSnapshot snapshot : dataSnapshot.getChildren()){
                     if(snapshot.child("name").getValue().toString().equals(bookName)) {
-                        bookBuyPrice = snapshot.child("salePrice").getValue().toString();
-                        bookRentPrice = snapshot.child("rentalPrice").getValue().toString();
-                        bookKey = snapshot.getKey();
+                        chosenBookDatabaseReference.child(user.getUid()).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for(DataSnapshot snapshot1: dataSnapshot.getChildren()) {
+                                    String bookId = (String)snapshot1.child("key").getValue();
+                                    if(snapshot.getKey().equals(bookId)) {
+                                        bookFoundFlag = 1;
+                                        if(snapshot.hasChild("download_url")) {
+                                            downloadLink = snapshot.child("download_url").getValue().toString();
+                                            enableDownloadButton();
+                                        }
+                                        break;
+                                    }
+                                }
+                                if(bookFoundFlag == 0) {
+                                    bookBuyPrice = snapshot.child("salePrice").getValue().toString();
+                                    bookRentPrice = snapshot.child("rentalPrice").getValue().toString();
+                                    bookKey = snapshot.getKey();
+                                    if(snapshot.hasChild("download_url")) {
+                                        enablePurchaseButtons();
+                                    }
+                                    else {
+                                        Toast.makeText(BookActivity.this, "This book is currently not available for download", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 }
-                enableButtons();
             }
 
             @Override
@@ -95,7 +138,7 @@ public class BookActivity extends AppCompatActivity {
         });
     }
 
-    void enableButtons() {
+    void enablePurchaseButtons() {
         buyButton.setEnabled(true);
         rentButton.setEnabled(true);
         buyButton.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +154,60 @@ public class BookActivity extends AppCompatActivity {
                 subtractCredits("rent");
             }
         });
+    }
+
+    void enableDownloadButton() {
+        downloadButton.setEnabled(true);
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(BookActivity.this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(BookActivity.this,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                    } else {
+                        ActivityCompat.requestPermissions(BookActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                    }
+                }
+                else {
+                    downloadFromLink(downloadLink, bookName);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    downloadFromLink(downloadLink, bookName);
+
+                } else {
+
+                }
+                return;
+            }
+        }
+    }
+
+    void downloadFromLink(String downloadURL, String name) {
+        String url = downloadURL;
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setTitle(name);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        }
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "name-of-the-file.ext");
+        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
     }
 
     void subtractCredits(final String mode) {
@@ -138,6 +235,7 @@ public class BookActivity extends AppCompatActivity {
                                 Toast.makeText(BookActivity.this, "Thank you!", Toast.LENGTH_SHORT).show();
                                 buyButton.setEnabled(false);
                                 rentButton.setEnabled(false);
+
                             }
                             else {
                                 Toast.makeText(BookActivity.this, "You do not have enough credits to buy this", Toast.LENGTH_SHORT).show();

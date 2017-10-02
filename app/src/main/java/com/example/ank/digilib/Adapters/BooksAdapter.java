@@ -32,6 +32,7 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MenuHolder>{
         private Book mBook;
         private String bookName;
         private String genreName;
+        private String bookId;
 
         public MenuHolder(View v) {
             super(v);

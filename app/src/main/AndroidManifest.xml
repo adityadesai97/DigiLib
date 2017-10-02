@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.ank.digilib">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,7 +26,8 @@
         <activity android:name=".Activities.MyBooksActivity" />
         <activity android:name=".Activities.MyFriendsActivity" />
         <activity android:name=".Activities.RequestsActivity" />
-        <activity android:name=".Activities.AddFriendActivity"></activity>
+        <activity android:name=".Activities.AddFriendActivity" />
+        <activity android:name=".Activities.BuyCreditsActivity"></activity>
     </application>
 
 </manifest>

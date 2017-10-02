@@ -8,6 +8,13 @@
     tools:context="com.example.ank.digilib.Activities.BookActivity"
     android:orientation="vertical"
     android:gravity="center">
+    
+    <Button
+        android:id="@+id/download_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Download"
+        android:enabled="false"/>
 
     <Button
         android:id="@+id/buy_button"

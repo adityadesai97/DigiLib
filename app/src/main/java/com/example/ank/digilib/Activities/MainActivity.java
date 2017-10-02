@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         ViewGroup actionBarLayout = (ViewGroup) getLayoutInflater().inflate(R.layout.custom_actionbar, null);
 
         actionBarLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -151,7 +150,8 @@ public class MainActivity extends AppCompatActivity {
         getMoreCredits.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "This feature is currently unavailable", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(MainActivity.this, BuyCreditsActivity.class);
+                startActivity(i);
             }
         });
 
@@ -339,7 +339,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUI2() {
-        Log.v("tag1", Integer.toString(feedList.size()));
         feedAdapter = new FeedAdapter(feedList);
         feedRecyclerView.setAdapter(feedAdapter);
     }
