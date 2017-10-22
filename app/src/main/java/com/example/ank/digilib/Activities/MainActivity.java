@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
@@ -36,6 +37,8 @@ import com.example.ank.digilib.Objects.User;
 import com.example.ank.digilib.R;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,7 +47,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -103,6 +110,10 @@ public class MainActivity extends AppCompatActivity {
         genreDatabaseReference = firebaseDatabase.getReference().child("books");
         chosenBooksDatabaseReference = firebaseDatabase.getReference().child("chosenBooks");
 
+//        genreDatabaseReference.child("Fantasy").push().setValue(new Book("Harry Potter and the Philosopher's Stone", "J.K. Rowling", "300", "75", "https://static.independent.co.uk/s3fs-public/styles/story_medium/public/thumbnails/image/2016/02/26/13/3-Harry-Potter-and-the-Philosophers-Stone.jpg", "Fantasy", "http://www2.sdfi.edu.cn/netclass/jiaoan/englit/download/Harry%20Potter%20and%20the%20Sorcerer's%20Stone.pdf"));
+//        genreDatabaseReference.child("Fantasy").push().setValue(new Book("Harry Potter and the Chamber of Secrets", "J.K. Rowling", "300", "75", "http://vignette1.wikia.nocookie.net/harrypotter/images/1/17/Chamberofsecrets.jpg/revision/latest?cb=20150208225435", "Fantasy", "http://ouenglish.ru/files/HP2.pdf"));
+//        genreDatabaseReference.child("Fantasy").push().setValue(new Book("Harry Potter and the Goblet of Fire", "J.K. Rowling", "300", "75", "http://harrypotterfanzone.com/wp-content/2009/06/gof-uk-kids-jacket-art.jpg", "Fantasy", "http://publish.uwo.ca/~hamendt/WD%20final%20Project/litertaure/Goblet%20of%20Fire.pdf"));
+
         genreList = new ArrayList<>();
         feedList = new ArrayList<>();
 
@@ -127,14 +138,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        com.github.clans.fab.FloatingActionButton teamFab = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.team_fab);
-        teamFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                menuFab.close(true);
-                Toast.makeText(v.getContext(), "This feature is currently unavailable", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        com.github.clans.fab.FloatingActionButton teamFab = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.team_fab);
+//        teamFab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                menuFab.close(true);
+//                Toast.makeText(v.getContext(), "This feature is currently unavailable", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         com.github.clans.fab.FloatingActionButton myFriendsFab = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.friends_fab);
         myFriendsFab.setOnClickListener(new View.OnClickListener() {
@@ -391,5 +402,4 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 }

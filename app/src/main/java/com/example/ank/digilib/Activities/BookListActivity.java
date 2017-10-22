@@ -83,8 +83,9 @@ public class BookListActivity extends AppCompatActivity {
                         String rentalPrice = (String) snapshot.child("rentalPrice").getValue();
                         String coverImageURL = (String) snapshot.child("coverImageURL").getValue();
                         String genreName = (String) snapshot.child("genreName").getValue();
+                        String fileName = (String) snapshot.child("fileName").getValue();
                         if(name != null) {
-                            bookList.add(new Book(name, author, salePrice, rentalPrice, coverImageURL, genreName));
+                            bookList.add(new Book(name, author, salePrice, rentalPrice, coverImageURL, genreName, fileName));
                         }
                     }
                     updateUI();

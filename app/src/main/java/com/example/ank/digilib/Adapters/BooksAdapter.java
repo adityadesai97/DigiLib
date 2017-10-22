@@ -32,6 +32,7 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MenuHolder>{
         private Book mBook;
         private String bookName;
         private String genreName;
+        private String fileName;
         private String bookId;
 
         public MenuHolder(View v) {
@@ -51,11 +52,13 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MenuHolder>{
             if(mBook!=null){
                 bookName = mBook.getName();
                 genreName = mBook.getGenreName();
+//                fileName = mBook.getFileName();
             }
 
             Intent i=new Intent(v.getContext(), BookActivity.class);
             i.putExtra("bookName", bookName);
             i.putExtra("genreName", genreName);
+            i.putExtra("fileName", fileName);
             v.getContext().startActivity(i);
         }
 

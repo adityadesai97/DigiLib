@@ -20,7 +20,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by adityadesai on 02/10/17.
@@ -33,6 +37,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.MenuHolder> {
     public static class MenuHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView nameTextView;
+        private TextView timeTextView;
         private ImageView profilePicture;
         private TextView bookNameTextView;
         private TextView authorTextView;
@@ -48,6 +53,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.MenuHolder> {
             super(v);
 
             nameTextView = (TextView) v.findViewById(R.id.name_text_view);
+            timeTextView = (TextView) v.findViewById(R.id.time_text_view);
             profilePicture = (ImageView) v.findViewById(R.id.profile_picture);
             bookNameTextView = (TextView) v.findViewById(R.id.book_name);
             authorTextView = (TextView) v.findViewById(R.id.book_author);
@@ -59,8 +65,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.MenuHolder> {
         public void onClick(View v) {
         }
 
-        public void bindIndustry(String name, String profilePictureURL, String bookName, String bookAuthor, String coverImageURL) {
+        public void bindIndustry(String name, String profilePictureURL, String bookName, String bookAuthor, String coverImageURL, int timeDifference) {
             nameTextView.setText(name);
+            timeTextView.setText(Integer.toString(timeDifference) + " minutes ago");
             Glide.with(profilePicture.getContext()).load(profilePictureURL).into(profilePicture);
             bookNameTextView.setText(bookName);
             authorTextView.setText("- " + bookAuthor);
@@ -86,6 +93,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.MenuHolder> {
         final String profilePictureURL = mFeedEvents.get(position).getProfile_id();
         String genreName = mFeedEvents.get(position).getGenreName();
         final String bookId = mFeedEvents.get(position).getBookId();
+        final String timestamp = mFeedEvents.get(position).getTimestamp();
         FirebaseDatabase.getInstance().getReference().child("books").child(genreName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -94,7 +102,18 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.MenuHolder> {
                         String bookName = (String)snapshot.child("name").getValue();
                         String bookAuthor = (String)snapshot.child("author").getValue();
                         String coverImageURL = (String)snapshot.child("coverImageURL").getValue();
-                        holder.bindIndustry(name, profilePictureURL, bookName, bookAuthor, coverImageURL);
+                        Calendar c = Calendar.getInstance();
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        Date givenDate = null;
+                        int timeDifference = 0;
+                        try {
+                            givenDate = df.parse(timestamp);
+                            Date currentDate = c.getTime();
+                            timeDifference = (int)(currentDate.getTime() - givenDate.getTime())/1000/60;
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        holder.bindIndustry(name, profilePictureURL, bookName, bookAuthor, coverImageURL, timeDifference);
                         break;
                     }
                 }

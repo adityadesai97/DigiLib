@@ -1,5 +1,6 @@
 package com.example.ank.digilib.Adapters;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.ank.digilib.Activities.ChatActivity;
 import com.example.ank.digilib.Objects.User;
 import com.example.ank.digilib.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MenuHolder> {
 
     private static ArrayList<User> mFriends;
+    private static String uid;
 
     public static class MenuHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -55,6 +58,11 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MenuHold
 
         @Override
         public void onClick(View v) {
+            Intent i = new Intent(v.getContext(), ChatActivity.class);
+            i.putExtra("frienduid", uid);
+            i.putExtra("myuid", user.getUid());
+            i.putExtra("myname", user.getDisplayName());
+            v.getContext().startActivity(i);
         }
 
         public void bindIndustry(final String name, final String profilePictureURL, final String uid, final String email) {
@@ -79,7 +87,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MenuHold
     public void onBindViewHolder(FriendsAdapter.MenuHolder holder, int position) {
         String name = mFriends.get(position).getName();
         String profilePictureURL = mFriends.get(position).getProfile_url();
-        String uid = mFriends.get(position).getUid();
+        uid = mFriends.get(position).getUid();
         String email = mFriends.get(position).getMail_id();
         holder.bindIndustry(name, profilePictureURL, uid, email);
     }

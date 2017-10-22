@@ -11,14 +11,16 @@ public class Book {
     private String rentalPrice;
     private String coverImageURL;
     private String genreName;
+    private String download_url;
 
-    public Book(String name, String author, String salePrice, String rentalPrice, String coverImageURL, String genreName) {
+    public Book(String name, String author, String salePrice, String rentalPrice, String coverImageURL, String genreName, String download_url) {
         this.name = name;
         this.author = author;
         this.salePrice = salePrice;
         this.rentalPrice = rentalPrice;
         this.coverImageURL = coverImageURL;
         this.genreName = genreName;
+        this.download_url = download_url;
     }
 
     public Book() {
@@ -47,5 +49,9 @@ public class Book {
 
     public String getGenreName() {
         return genreName;
+    }
+
+    public String getDownload_url() {
+        return download_url;
     }
 }

@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.ank.digilib.Adapters.FriendsAdapter;
 import com.example.ank.digilib.Adapters.RequestsAdapter;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 public class MyFriendsActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
+    private TextView isEmptyMarker;
     LinearLayoutManager linearLayoutManager;
     FriendsAdapter adapter;
 
@@ -54,6 +56,8 @@ public class MyFriendsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(actionBarLayout);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
+
+        isEmptyMarker = (TextView) findViewById(R.id.is_empty_marker);
 
         friendsList = new ArrayList<>();
 
@@ -143,6 +147,12 @@ public class MyFriendsActivity extends AppCompatActivity {
     }
 
     public void updateUI() {
+        if(friendsList.isEmpty()) {
+            isEmptyMarker.setText("You don't have any friends yet!");
+        }
+        else {
+            isEmptyMarker.setText("");
+        }
         adapter = new FriendsAdapter(friendsList);
         recyclerView.setAdapter(adapter);
     }

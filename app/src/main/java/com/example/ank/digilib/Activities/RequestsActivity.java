@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public class RequestsActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
+    private TextView isEmptyMarker;
     LinearLayoutManager linearLayoutManager;
     RequestsAdapter adapter;
 
@@ -54,6 +55,8 @@ public class RequestsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(actionBarLayout);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
+
+        isEmptyMarker = (TextView) findViewById(R.id.is_empty_marker);
 
         requestList = new ArrayList<>();
 
@@ -120,6 +123,12 @@ public class RequestsActivity extends AppCompatActivity {
     }
 
     public void updateUI() {
+        if(requestList.isEmpty()) {
+            isEmptyMarker.setText("You don't have any pending requests!");
+        }
+        else {
+            isEmptyMarker.setText("");
+        }
         adapter = new RequestsAdapter(requestList);
         recyclerView.setAdapter(adapter);
     }

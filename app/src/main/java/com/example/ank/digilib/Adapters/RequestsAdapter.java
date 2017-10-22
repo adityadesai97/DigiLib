@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.ank.digilib.Activities.BookActivity;
 import com.example.ank.digilib.Objects.Book;
+import com.example.ank.digilib.Objects.ChatIdentifier;
 import com.example.ank.digilib.Objects.User;
 import com.example.ank.digilib.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,6 +47,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.MenuHo
         FirebaseDatabase firebaseDatabase;
         FirebaseAuth firebaseAuth;
         DatabaseReference databaseReference;
+        DatabaseReference chatReference;
         FirebaseUser user;
 
         public MenuHolder(View v) {
@@ -58,6 +60,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.MenuHo
 
             firebaseDatabase = FirebaseDatabase.getInstance();
             databaseReference = firebaseDatabase.getReference().child("users");
+            chatReference = firebaseDatabase.getReference().child("chats");
             firebaseAuth = FirebaseAuth.getInstance();
             user = firebaseAuth.getCurrentUser();
             v.setOnClickListener(this);
@@ -79,6 +82,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.MenuHo
                             for(final DataSnapshot snapshot: dataSnapshot.getChildren()) {
                                 if(snapshot.child("uid").getValue().equals(user.getUid())) {
                                     databaseReference.child(snapshot.getKey()).child("friends").push().setValue(new User(name, uid, email, profilePictureURL, null));
+                                    chatReference.push().setValue(new ChatIdentifier(user.getUid(), uid));
                                     databaseReference.child(snapshot.getKey()).child("requests").addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(DataSnapshot dataSnapshot) {

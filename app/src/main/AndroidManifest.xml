@@ -4,7 +4,9 @@
     package="com.example.ank.digilib">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -27,7 +29,9 @@
         <activity android:name=".Activities.MyFriendsActivity" />
         <activity android:name=".Activities.RequestsActivity" />
         <activity android:name=".Activities.AddFriendActivity" />
-        <activity android:name=".Activities.BuyCreditsActivity"></activity>
+        <activity android:name=".Activities.BuyCreditsActivity" />
+        <activity android:name=".Activities.ChatActivity" />
+        <activity android:name=".Activities.ViewBookActivity"></activity>
     </application>
 
 </manifest>

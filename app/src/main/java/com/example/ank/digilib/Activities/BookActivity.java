@@ -5,11 +5,14 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +26,8 @@ import android.widget.Toast;
 import com.example.ank.digilib.Objects.ChosenBook;
 import com.example.ank.digilib.Objects.FeedEvent;
 import com.example.ank.digilib.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -30,7 +35,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -51,6 +61,7 @@ public class BookActivity extends AppCompatActivity {
 
     private String genreName;
     private String bookName;
+    private String fileName;
     private String bookBuyPrice;
     private String bookRentPrice;
     private String bookKey;
@@ -77,6 +88,7 @@ public class BookActivity extends AppCompatActivity {
         Intent i = getIntent();
         genreName = i.getStringExtra("genreName");
         bookName = i.getStringExtra("bookName");
+        fileName = i.getStringExtra("fileName");
 
         setTitle(bookName);
 
@@ -161,20 +173,53 @@ public class BookActivity extends AppCompatActivity {
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(BookActivity.this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
+//                if (ContextCompat.checkSelfPermission(BookActivity.this,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                        != PackageManager.PERMISSION_GRANTED) {
+//
+//                    if (ActivityCompat.shouldShowRequestPermissionRationale(BookActivity.this,
+//                            Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//
+//                    } else {
+//                        ActivityCompat.requestPermissions(BookActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+//                    }
+//                }
+//                else {
+//                    downloadFromLink(downloadLink, bookName);
+//                }
 
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(BookActivity.this,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//                Uri intentUri = Uri.parse(downloadLink);
+//
+//                Intent intent = new Intent();
+//                intent.setAction(Intent.ACTION_VIEW);
+//                intent.setData(intentUri);
+//                startActivity(intent);
 
-                    } else {
-                        ActivityCompat.requestPermissions(BookActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-                    }
-                }
-                else {
-                    downloadFromLink(downloadLink, bookName);
-                }
+                downloadFile(fileName);
+            }
+        });
+    }
+
+    private void downloadFile(final String fileName) {
+
+
+        StorageReference islandRef = FirebaseStorage.getInstance().getReference().child(fileName);
+
+        File localFile = new File(Environment.getExternalStorageDirectory() + "/Download", fileName);
+
+        final File finalLocalFile = localFile;
+        islandRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                // Local temp file has been created
+                Log.v("tag1", finalLocalFile.getAbsolutePath());
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.v("tag1", exception.getCause().toString());
+
             }
         });
     }
@@ -231,7 +276,7 @@ public class BookActivity extends AppCompatActivity {
                                 taskMap.put("credits", Integer.toString(newCredits));
                                 userDatabaseReference.child(key).updateChildren(taskMap);
                                 userDatabaseReference.child(key).child("activity").push().setValue(new FeedEvent(genreName, name, profilePictureURL, bookKey, mode, formattedDate));
-                                chosenBookDatabaseReference.child(uid).push().setValue(new ChosenBook(bookKey, genreName, "buy"));
+                                chosenBookDatabaseReference.child(uid).push().setValue(new ChosenBook(bookKey, genreName, "buy", formattedDate, fileName));
                                 Toast.makeText(BookActivity.this, "Thank you!", Toast.LENGTH_SHORT).show();
                                 buyButton.setEnabled(false);
                                 rentButton.setEnabled(false);
@@ -248,7 +293,7 @@ public class BookActivity extends AppCompatActivity {
                                 taskMap.put("credits", Integer.toString(newCredits));
                                 userDatabaseReference.child(key).updateChildren(taskMap);
                                 userDatabaseReference.child(key).child("activity").push().setValue(new FeedEvent(genreName, name, profilePictureURL, bookKey, mode, formattedDate));
-                                chosenBookDatabaseReference.child(uid).push().setValue(new ChosenBook(bookKey, genreName, "rent"));
+                                chosenBookDatabaseReference.child(uid).push().setValue(new ChosenBook(bookKey, genreName, "rent", formattedDate, fileName));
                                 Toast.makeText(BookActivity.this, "Thank you!", Toast.LENGTH_SHORT).show();
                                 buyButton.setEnabled(false);
                                 rentButton.setEnabled(false);

@@ -63,7 +63,7 @@ public class BuyCreditsActivity extends AppCompatActivity {
 
         SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
 
-        if(pref.getBoolean("first_time", true)) {
+        if(!pref.contains("cvv")) {
             final SharedPreferences.Editor editor = pref.edit();
             numberEditText.setVisibility(View.VISIBLE);
             cvvEditText.setVisibility(View.VISIBLE);
@@ -103,7 +103,6 @@ public class BuyCreditsActivity extends AppCompatActivity {
                     });
                 }
             });
-            editor.putBoolean("first_time", false);
             editor.commit();
         }
         else {
