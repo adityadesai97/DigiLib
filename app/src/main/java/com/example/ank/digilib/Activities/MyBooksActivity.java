@@ -114,9 +114,9 @@ public class MyBooksActivity extends AppCompatActivity {
                                             e.printStackTrace();
                                         }
                                         if(purchaseType.equals("rent") && timeDifference >= 1) {
-                                            File file = new File("/storage/emulated/0/Download/" + fileName);
-                                            Log.v("tag1" ,"/storage/emulated/0/Download/" + fileName);
-                                            file.delete();
+//                                            File file = new File("/storage/emulated/0/Download/" + fileName);
+//                                            Log.v("tag1" ,"/storage/emulated/0/Download/" + fileName);
+//                                            file.delete();
                                             chosenBooksDatabaseReference.child(uid).child(snapshot1.getKey()).removeValue();
                                         }
                                         booksDatabaseReference.child(genreName).addValueEventListener(new ValueEventListener() {

@@ -127,7 +127,7 @@ public class BookActivity extends AppCompatActivity {
                                     bookRentPrice = snapshot.child("rentalPrice").getValue().toString();
                                     bookKey = snapshot.getKey();
                                     if(snapshot.hasChild("download_url")) {
-                                        enablePurchaseButtons();
+                                        enablePurchaseButtons(bookBuyPrice, bookRentPrice);
                                     }
                                     else {
                                         Toast.makeText(BookActivity.this, "This book is currently not available for download", Toast.LENGTH_SHORT).show();
@@ -150,7 +150,11 @@ public class BookActivity extends AppCompatActivity {
         });
     }
 
-    void enablePurchaseButtons() {
+    void enablePurchaseButtons(String buy, String rent) {
+        TextView buy_price = (TextView)findViewById(R.id.buy_price);
+        TextView rent_price = (TextView)findViewById(R.id.rent_price);
+        buy_price.setText("Rs " + buy);
+        rent_price.setText("Rs " + rent);
         buyButton.setEnabled(true);
         rentButton.setEnabled(true);
         buyButton.setOnClickListener(new View.OnClickListener() {

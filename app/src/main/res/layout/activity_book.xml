@@ -17,18 +17,53 @@
         android:enabled="false"
         android:visibility="gone"/>
 
-    <Button
-        android:id="@+id/buy_button"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Buy"
-        android:enabled="false"/>
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_button"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginBottom="20dp">
 
-    <Button
-        android:id="@+id/rent_button"
+        <Button
+            android:id="@+id/buy_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Buy"
+            android:enabled="false"
+            android:layout_marginRight="10dp"
+            android:background="@color/tw__transparent"/>
+
+        <TextView
+            android:id="@+id/buy_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rent"
-        android:enabled="false"/>
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_button"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <Button
+            android:id="@+id/rent_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rent"
+            android:enabled="false"
+            android:layout_marginRight="10dp"
+            android:background="@color/tw__transparent"/>
+
+        <TextView
+            android:id="@+id/rent_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 </LinearLayout>

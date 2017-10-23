@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDark"
+    android:padding="5dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_picture"
@@ -18,13 +20,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp">
 
         <TextView
             android:id="@+id/name_text_view"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:fontFamily="cursive"
+            android:textSize="20dp"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -35,13 +41,16 @@
                 android:id="@+id/accept_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Accept"/>
+                android:text="Accept"
+                android:background="@drawable/rounded_button"/>
 
             <Button
                 android:id="@+id/reject_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Reject"/>
+                android:text="Reject"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/rounded_button"/>
 
         </LinearLayout>
 
